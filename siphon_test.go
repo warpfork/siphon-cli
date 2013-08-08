@@ -119,7 +119,7 @@ func TestUnixSocket(t *testing.T) {
 	host.Start()
 
 	go func() {
-		stdin := host.StdinPipe()
+		stdin := client.Stdin()
 		stdin.Write([]byte("foo\nbar\nbaz\n"))
 		stdin.Write([]byte{4}) // EOT
 	}()
