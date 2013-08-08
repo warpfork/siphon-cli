@@ -1,0 +1,12 @@
+[submodule "src/polydawn.net/siphon"]
+	path = src/polydawn.net/siphon
+	url = https://github.com/heavenlyhash/siphon
+[submodule "src/github.com/kr/pty"]
+	path = src/github.com/kr/pty
+	url = https://github.com/kr/pty
+[submodule "src/github.com/coocood/assrt"]
+	path = src/github.com/coocood/assrt
+	url = https://github.com/coocood/assrt
+[submodule "src/github.com/dotcloud/docker"]
+	path = src/github.com/dotcloud/docker
+	url = https://github.com/dotcloud/docker
