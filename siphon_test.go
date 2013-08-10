@@ -7,6 +7,7 @@ import (
 	"io"
 	"os/exec"
 	"testing"
+	"time"
 	"github.com/coocood/assrt"
 )
 
@@ -136,6 +137,56 @@ func TestUnixSocket(t *testing.T) {
 	assert.Equal(
 		expected,
 		out,
+	)
+}
+
+func TestDoubleClient(t *testing.T) {
+	assert := assrt.NewAssert(t)
+
+	addr := siphon.NewAddr("test", "unix", "test.sock")
+
+	cmd := exec.Command("cat", "-")
+	host := siphon.NewHost(cmd, addr)
+	host.Serve(); defer host.UnServe()
+
+	client1 := siphon.NewClient(addr)
+	client1.Connect()
+
+	client2 := siphon.NewClient(addr)
+	client2.Connect()
+
+	host.Start()
+
+	go func() {
+		// timed pauses are a hack required to make sure the host side flushes the echos in an order we can test.
+		client1.Stdin().Write([]byte("foo\n"))
+		time.Sleep(50*time.Millisecond)
+		client2.Stdin().Write([]byte("bar\n"))
+		time.Sleep(50*time.Millisecond)
+		client1.Stdin().Write([]byte("baz\n"))
+		time.Sleep(50*time.Millisecond)
+		client2.Stdin().Write([]byte{4}) // EOT
+	}()
+
+	outBuffer1 := new(bytes.Buffer)
+	io.Copy(outBuffer1, client1.Stdout())
+	out1 := string(outBuffer1.Bytes())
+
+	outBuffer2 := new(bytes.Buffer)
+	io.Copy(outBuffer2, client2.Stdout())
+	out2 := string(outBuffer2.Bytes())
+
+	expected :=
+		"foo\r\nfoo\r\n"+
+		"bar\r\nbar\r\n"+
+		"baz\r\nbaz\r\n";
+	assert.Equal(
+		expected,
+		out1,
+	)
+	assert.Equal(
+		expected,
+		out2,
 	)
 }
 
