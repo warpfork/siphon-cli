@@ -10,3 +10,6 @@
 [submodule "src/github.com/dotcloud/docker"]
 	path = src/github.com/dotcloud/docker
 	url = https://github.com/dotcloud/docker
+[submodule "src/github.com/jessevdk/go-flags"]
+	path = src/github.com/jessevdk/go-flags
+	url = https://github.com/jessevdk/go-flags.git
