@@ -1,2 +1,2 @@
 #!/bin/bash
-GOPATH=$PWD go build -o siphon
+GOPATH=$PWD go build -race -o siphon
