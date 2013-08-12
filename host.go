@@ -15,4 +15,6 @@ func host(options *attachOpts_t, socket, command string) {
 
 	host.Serve(); defer host.UnServe()
 	host.Start()
+	exitCode := host.Wait()
+	fmt.Printf("siphon: %s exited %d\r\n", command, exitCode)
 }
