@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"polydawn.net/siphon"
 )
 
@@ -12,5 +13,5 @@ func attach(options *attachOpts_t, socket string) {
 	client := siphon.NewClient(addr)
 
 	client.Connect()
-	client.Attach()
+	client.Attach(os.Stdin, os.Stdout)
 }
