@@ -24,6 +24,7 @@ type daemonOpts_t struct {
 
 
 func main() {
+	defer panicHandler()
 
 	//Create command options
 	attachOpts := new(attachOpts_t)
@@ -81,5 +82,16 @@ func main() {
 	default:
 		fmt.Errorf("Please specify attach, host, or daemon.")
 
+	}
+}
+
+func panicHandler() {
+	// print only the error message (don't dump stacks).
+	// unless any debug mode is on; then don't recover, because we want to dump stacks.
+	if len(os.Getenv("DEBUG")) == 0 {
+		if err := recover(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(2)
+		}
 	}
 }
