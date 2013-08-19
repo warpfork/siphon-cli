@@ -6,10 +6,15 @@ import (
 	"polydawn.net/siphon"
 )
 
-func attach(options *attachOpts_t, socket string) {
-	fmt.Printf("Attaching to %s\n", socket)
+func attach(opts attachOpts_t) {
+	addr, err := ParseNewAddr(opts.Address)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "siphon: %s\n", err)
+		os.Exit(1)
+	}
 
-	addr := siphon.NewAddr("Siphon-Attach", "unix", socket)
+	fmt.Printf("Attaching to %s\n", addr.Label())
+
 	client := siphon.NewClient(addr)
 
 	client.Connect()

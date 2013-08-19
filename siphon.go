@@ -5,16 +5,19 @@ import (
 	"os"
 	"fmt"
 	"github.com/jessevdk/go-flags"
+	"polydawn.net/siphon"
+	"strings"
 )
 
 //Options for attach
 type attachOpts_t struct {
-
+	Address string `short:"L" long:"addr" default:"defaults to unix://siphon.sock" description:"Address of host to dial, of the form unix://path/to/socket"`
 }
 
 //Options for host
 type hostOpts_t struct {
-
+	Address string `short:"L" long:"addr" optional:"true" default:"defaults to unix://siphon.sock" description:"Address to bind to and await client attachings, of the form unix://path/to/socket" `
+	Command string `short:"c" long:"command" optional:"true" default:"defaults to /bin/sh" description:"Command to execute inside the new psuedoterminal" `
 }
 
 //Options for daemon
@@ -27,18 +30,23 @@ func main() {
 	defer panicHandler()
 
 	//Create command options
-	attachOpts := new(attachOpts_t)
-	hostOpts   := new(hostOpts_t)
-	daemonOpts := new(daemonOpts_t)
+	attachOpts := attachOpts_t{
+		Address: "unix://siphon.sock",
+	}
+	hostOpts := hostOpts_t{
+		Address: "unix://siphon.sock",
+		Command: "/bin/sh",
+	}
+	daemonOpts := daemonOpts_t{}
 
 	//Construct parser with commands
 	parser := flags.NewNamedParser("siphon", flags.HelpFlag)
-	parser.AddCommand("host",   "host", "Host a process", attachOpts)
-	parser.AddCommand("attach", "attach", "Attach to a host", hostOpts)
-	parser.AddCommand("daemon", "daemon", "Run a daemon to spawn hosts", daemonOpts)
+	parser.AddCommand("host",   "host", "Host a process", &hostOpts)
+	parser.AddCommand("attach", "attach", "Attach to a host", &attachOpts)
+	parser.AddCommand("daemon", "daemon", "Run a daemon to spawn hosts", &daemonOpts)
 
 	//Parse arguments, handle errors/help
-	args, err := parser.Parse() //whelp
+	_, err := parser.Parse()
 	if err != nil {
 		if err.(*flags.Error).Type == flags.ErrHelp { //Usage help
 			fmt.Printf("%s", err)
@@ -52,29 +60,10 @@ func main() {
 	switch os.Args[1] {
 
 	case "attach":
-		socket := ""
-		if len(os.Args) < 3 {
-			socket = "./siphon.sock" //default
-		} else {
-			socket = os.Args[2]
-		}
-
-		attach(attachOpts, socket)
+		attach(attachOpts)
 
 	case "host":
-		socket, command := "", ""
-		if len(args) < 1 {
-			socket = "./siphon.sock" //default
-			command = "/bin/bash"
-		} else if len(args) < 2 {
-			socket = args[0]
-			command = "/bin/bash"
-		} else {
-			socket = args[0]
-			command = args[1]
-		}
-
-		host(attachOpts, socket, command)
+		host(hostOpts)
 
 	case "daemon":
 		fmt.Errorf("Daemon mode is not implemented yet.")
@@ -93,5 +82,18 @@ func panicHandler() {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(2)
 		}
+	}
+}
+
+func ParseNewAddr(addr string) (siphon.Addr, error) {
+	addrParts := strings.SplitN(addr, "://", 2)
+	switch addrParts[0] {
+	case "unix":
+		return siphon.NewAddr(addr, "unix", addrParts[1]), nil
+	// case "tcp":
+	//	// lib siphon supports this, but it's so very likely to be a bad idea that i'm making you compile a program for it yourself if you want this.
+	//	return siphon.NewAddr(addr, "tcp", addrParts[1]), nil
+	default:
+		return siphon.Addr{}, fmt.Errorf("invalid protocol format.  \"%s\"", addr)
 	}
 }
