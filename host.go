@@ -7,7 +7,19 @@ import (
 	"polydawn.net/siphon"
 )
 
-func host(opts hostOpts_t) {
+type hostOpts struct {
+	Address string `short:"L" long:"addr" optional:"true" default:"defaults to unix://siphon.sock" description:"Address to bind to and await client attachings, of the form unix://path/to/socket" `
+	Command string `short:"c" long:"command" optional:"true" default:"defaults to /bin/sh" description:"Command to execute inside the new psuedoterminal" `
+}
+
+func init() {
+	parser.AddCommand("host", "host", "Host a process", &hostOpts{
+		Address: "unix://siphon.sock",
+		Command: "/bin/sh",
+	})
+}
+
+func (opts *hostOpts) Execute(args []string) error {
 	addr, err := ParseNewAddr(opts.Address)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "siphon: %s\n", err)
@@ -23,4 +35,6 @@ func host(opts hostOpts_t) {
 	host.Start()
 	exitCode := host.Wait()
 	fmt.Printf("siphon: %s exited %d\r\n", opts.Command, exitCode)
+
+	return nil
 }

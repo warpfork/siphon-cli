@@ -9,41 +9,10 @@ import (
 	"strings"
 )
 
-//Options for attach
-type attachOpts_t struct {
-	Address string `short:"L" long:"addr" default:"defaults to unix://siphon.sock" description:"Address of host to dial, of the form unix://path/to/socket"`
-}
-
-//Options for host
-type hostOpts_t struct {
-	Address string `short:"L" long:"addr" optional:"true" default:"defaults to unix://siphon.sock" description:"Address to bind to and await client attachings, of the form unix://path/to/socket" `
-	Command string `short:"c" long:"command" optional:"true" default:"defaults to /bin/sh" description:"Command to execute inside the new psuedoterminal" `
-}
-
-//Options for daemon
-type daemonOpts_t struct {
-
-}
-
+var parser = flags.NewNamedParser("siphon", flags.Default)
 
 func main() {
 	defer panicHandler()
-
-	//Create command options
-	attachOpts := attachOpts_t{
-		Address: "unix://siphon.sock",
-	}
-	hostOpts := hostOpts_t{
-		Address: "unix://siphon.sock",
-		Command: "/bin/sh",
-	}
-	daemonOpts := daemonOpts_t{}
-
-	//Construct parser with commands
-	parser := flags.NewNamedParser("siphon", flags.HelpFlag)
-	parser.AddCommand("host",   "host", "Host a process", &hostOpts)
-	parser.AddCommand("attach", "attach", "Attach to a host", &attachOpts)
-	parser.AddCommand("daemon", "daemon", "Run a daemon to spawn hosts", &daemonOpts)
 
 	//Parse arguments, handle errors/help
 	_, err := parser.Parse()
@@ -54,23 +23,6 @@ func main() {
 			fmt.Printf("Error parsing: %s\n", err)
 		}
 		os.Exit(1)
-	}
-
-	//Switch on command... sloppy, should integrate with go-flags
-	switch os.Args[1] {
-
-	case "attach":
-		attach(attachOpts)
-
-	case "host":
-		host(hostOpts)
-
-	case "daemon":
-		fmt.Errorf("Daemon mode is not implemented yet.")
-
-	default:
-		fmt.Errorf("Please specify attach, host, or daemon.")
-
 	}
 }
 
