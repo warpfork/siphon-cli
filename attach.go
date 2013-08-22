@@ -25,7 +25,7 @@ func (opts *attachOpts) Execute(args []string) error {
 
 	fmt.Printf("Attaching to %s\n", addr.Label())
 
-	client := siphon.NewClient(addr)
+	client := siphon.Connect(addr)
 
 	client.Connect()
 	client.Attach(os.Stdin, os.Stdout)
