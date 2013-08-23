@@ -11,6 +11,9 @@ import (
 
 var parser = flags.NewNamedParser("siphon", flags.Default)
 
+var EXIT_BADARGS = 1
+var EXIT_PANIC = 2
+
 func main() {
 	defer panicHandler()
 
@@ -22,7 +25,7 @@ func main() {
 		} else {
 			fmt.Printf("Error parsing: %s\n", err)
 		}
-		os.Exit(1)
+		os.Exit(EXIT_BADARGS)
 	}
 }
 
@@ -32,7 +35,7 @@ func panicHandler() {
 	if len(os.Getenv("DEBUG")) == 0 {
 		if err := recover(); err != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(2)
+			os.Exit(EXIT_PANIC)
 		}
 	}
 }

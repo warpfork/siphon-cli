@@ -23,7 +23,7 @@ func (opts *hostOpts) Execute(args []string) error {
 	addr, err := ParseNewAddr(opts.Address)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "siphon: %s\n", err)
-		os.Exit(1)
+		os.Exit(EXIT_BADARGS)
 	}
 	cmd := exec.Command(opts.Command)
 

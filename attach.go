@@ -20,7 +20,7 @@ func (opts *attachOpts) Execute(args []string) error {
 	addr, err := ParseNewAddr(opts.Address)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "siphon: %s\n", err)
-		os.Exit(1)
+		os.Exit(EXIT_BADARGS)
 	}
 
 	fmt.Printf("Attaching to %s\n", addr.Label())
