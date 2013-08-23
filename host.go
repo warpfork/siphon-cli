@@ -29,7 +29,7 @@ func (opts *hostOpts) Execute(args []string) error {
 	}
 	cmd := exec.Command(opts.Command)
 
-	fmt.Printf("Hosting %s at %s\n", opts.Command, addr.Label())
+	fmt.Printf("Hosting %s at %s\n", opts.Command, addr.Label)
 
 	host := siphon.NewHost(cmd, addr)
 

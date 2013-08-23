@@ -23,7 +23,7 @@ func (opts *attachOpts) Execute(args []string) error {
 		os.Exit(EXIT_BADARGS)
 	}
 
-	fmt.Printf("Attaching to %s\n", addr.Label())
+	fmt.Printf("Attaching to %s\n", addr.Label)
 
 	client := siphon.Connect(addr)
 
