@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"polydawn.net/siphon"
+	"syscall"
 )
 
 type hostOpts struct {
@@ -31,7 +33,17 @@ func (opts *hostOpts) Execute(args []string) error {
 
 	host := siphon.NewHost(cmd, addr)
 
-	host.Serve(); defer host.UnServe()
+	serveErr := host.Serve()
+	defer host.UnServe()
+	if serveErr != nil {
+		if serveOpError, ok := serveErr.(*net.OpError); ok && serveOpError.Err == syscall.EADDRINUSE {
+			fmt.Fprintf(os.Stderr, "%s\n", serveErr)
+			os.Exit(EXIT_BIND_IN_USE)
+		} else {
+			panic(serveErr)
+		}
+	}
+
 	host.Start()
 	exitCode := host.Wait()
 	fmt.Printf("siphon: %s exited %d\r\n", opts.Command, exitCode)

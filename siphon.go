@@ -13,6 +13,7 @@ var parser = flags.NewNamedParser("siphon", flags.Default)
 
 var EXIT_BADARGS = 1
 var EXIT_PANIC = 2
+var EXIT_BIND_IN_USE = 14
 
 func main() {
 	defer panicHandler()
