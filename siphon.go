@@ -76,7 +76,6 @@ func HandleShutdown() chan func() {
 					fmt.Printf("Caught Ctrl-C\n")
 					os.Exit(1)
 				case callback = <- listenerCh:
-					fmt.Printf("Caught a listener\n")
 			}
 		}
 	}(listenCh)
