@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"fmt"
-	"net"
 	"github.com/jessevdk/go-flags"
 	"polydawn.net/siphon"
 	"strings"
@@ -56,26 +55,27 @@ func ParseNewAddr(addr string) (siphon.Addr, error) {
 	}
 }
 
-//Handle interrupt signals gracefully
-func HandleShutdown() chan net.Listener {
+//Handle interrupt signals gracefully.
+//This returns a channel through which you can pass a callback. This lets you define your own shutdown behavior.
+func HandleShutdown() chan func() {
 	shutdown := make(chan os.Signal)    // gets interrupt signal from os/signal
-	listenCh := make(chan net.Listener) // siphon hands us a listener to close when shutting down
-	var listener net.Listener
+	listenCh := make(chan func()) // siphon hands us a listener to close when shutting down
+	var callback func()
 
 	//Tell go to inform us of interrupts
 	signal.Notify(shutdown, os.Interrupt)
 
 	//Store the listener when siphons hands it off, and handle shutdown signal
-	go func(listenerCh <- chan net.Listener) {
+	go func(listenerCh <- chan func()) {
 		for {
 			select {
 				case <- shutdown:
-					if listener != nil {
-						listener.Close()
+					if callback != nil {
+						callback()
 					}
 					fmt.Printf("Caught Ctrl-C\n")
 					os.Exit(1)
-				case listener = <- listenerCh:
+				case callback = <- listenerCh:
 					fmt.Printf("Caught a listener\n")
 			}
 		}

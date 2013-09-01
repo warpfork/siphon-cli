@@ -38,14 +38,18 @@ func (opts *daemonOpts) Execute(args []string) error {
 		os.Exit(EXIT_BADARGS)
 	}
 
-	listenCh := HandleShutdown()
+	listenCh := HandleShutdown() //handle control-c gracefully
 	daemon := &Daemon{ opts: opts }
 
 	listener, err := net.Listen(addr.Proto, addr.Addr)
 	if err != nil {
 		panic(err)
 	}
-	listenCh <- listener
+
+	//Give the shutdown handler a callback to close the listener
+	listenCh <- func() {
+		listener.Close()
+	}
 
 	fmt.Printf("Serving daemon at %s\n", addr.Label)
 
