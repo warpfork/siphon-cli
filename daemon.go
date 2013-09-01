@@ -38,13 +38,17 @@ func (opts *daemonOpts) Execute(args []string) error {
 		os.Exit(EXIT_BADARGS)
 	}
 
-	fmt.Printf("Serving daemon at %s\n", addr.Label)
+	listenCh := HandleShutdown()
 	daemon := &Daemon{ opts: opts }
 
 	listener, err := net.Listen(addr.Proto, addr.Addr)
 	if err != nil {
 		panic(err)
 	}
+	listenCh <- listener
+
+	fmt.Printf("Serving daemon at %s\n", addr.Label)
+
 	for listener != nil {
 		conn, err := listener.Accept();
 		if err != nil {
