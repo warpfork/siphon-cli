@@ -1,2 +1,3 @@
 #!/bin/bash
-GOPATH=$PWD go build -race -o siphon
+git submodule update --init
+GOPATH=$PWD go build -o siphon
