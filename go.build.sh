@@ -1,3 +1,3 @@
 #!/bin/bash
 git submodule update --init
-GOPATH=$PWD go build -o siphon
+GOPATH="$PWD/.gopath/" go build -o siphon

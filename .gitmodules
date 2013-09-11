@@ -1,15 +1,15 @@
-[submodule "src/polydawn.net/siphon"]
-	path = src/polydawn.net/siphon
+[submodule ".gopath/src/polydawn.net/siphon"]
+	path = .gopath/src/polydawn.net/siphon
 	url = https://github.com/heavenlyhash/siphon
-[submodule "src/github.com/kr/pty"]
-	path = src/github.com/kr/pty
+[submodule ".gopath/src/github.com/kr/pty"]
+	path = .gopath/src/github.com/kr/pty
 	url = https://github.com/kr/pty
-[submodule "src/github.com/coocood/assrt"]
-	path = src/github.com/coocood/assrt
+[submodule ".gopath/src/github.com/coocood/assrt"]
+	path = .gopath/src/github.com/coocood/assrt
 	url = https://github.com/coocood/assrt
-[submodule "src/github.com/dotcloud/docker"]
-	path = src/github.com/dotcloud/docker
+[submodule ".gopath/src/github.com/dotcloud/docker"]
+	path = .gopath/src/github.com/dotcloud/docker
 	url = https://github.com/dotcloud/docker
-[submodule "src/github.com/jessevdk/go-flags"]
-	path = src/github.com/jessevdk/go-flags
+[submodule ".gopath/src/github.com/jessevdk/go-flags"]
+	path = .gopath/src/github.com/jessevdk/go-flags
 	url = https://github.com/jessevdk/go-flags.git
