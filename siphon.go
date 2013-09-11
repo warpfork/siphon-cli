@@ -3,6 +3,7 @@ package main
 
 import (
 	"os"
+	"os/signal"
 	"fmt"
 	"github.com/jessevdk/go-flags"
 	"polydawn.net/siphon"
@@ -53,3 +54,32 @@ func ParseNewAddr(addr string) (siphon.Addr, error) {
 		return siphon.Addr{}, fmt.Errorf("invalid protocol format.  \"%s\"", addr)
 	}
 }
+
+//Handle interrupt signals gracefully.
+//This returns a channel through which you can pass a callback. This lets you define your own shutdown behavior.
+func HandleShutdown() chan func() {
+	shutdown := make(chan os.Signal)    // gets interrupt signal from os/signal
+	listenCh := make(chan func()) // siphon hands us a listener to close when shutting down
+	var callback func()
+
+	//Tell go to inform us of interrupts
+	signal.Notify(shutdown, os.Interrupt)
+
+	//Store the listener when siphons hands it off, and handle shutdown signal
+	go func(listenerCh <- chan func()) {
+		for {
+			select {
+				case <- shutdown:
+					if callback != nil {
+						callback()
+					}
+					fmt.Printf("Caught Ctrl-C\n")
+					os.Exit(1)
+				case callback = <- listenerCh:
+			}
+		}
+	}(listenCh)
+
+	return listenCh
+}
+

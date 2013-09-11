@@ -27,11 +27,18 @@ func (opts *hostOpts) Execute(args []string) error {
 		fmt.Fprintf(os.Stderr, "siphon: %s\n", err)
 		os.Exit(EXIT_BADARGS)
 	}
-	cmd := exec.Command(opts.Command)
 
-	fmt.Printf("Hosting %s at %s\n", opts.Command, addr.Label)
+	cmd := exec.Command(opts.Command)
+	shutdownCh := HandleShutdown() //handle control-c gracefully
 
 	host := siphon.NewHost(cmd, addr)
+
+	//Give the shutdown handler a callback to close the host
+	shutdownCh <- func() {
+		host.UnServe()
+	}
+
+	fmt.Printf("Hosting %s at %s\n", opts.Command, addr.Label)
 
 	serveErr := host.Serve()
 	defer host.UnServe()
