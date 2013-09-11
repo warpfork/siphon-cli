@@ -13,14 +13,14 @@ import (
 )
 
 type daemonOpts struct {
-	Address string `short:"L" long:"addr" optional:"true" default:"defaults to unix://siphon.daemon.sock" description:"Address to bind to and await client attachings, of the form unix://path/to/socket.  Each new client connection will result in the spawning of a new siphon host process, which the client will be transparently redirected to."`
+	Address string `short:"L" long:"addr" optional:"true" default:"defaults to unix://siphon.sock" description:"Address to bind to and await client attachings, of the form unix://path/to/socket.  Each new client connection will result in the spawning of a new siphon host process, which the client will be transparently redirected to."`
 	HostAddress string `short:"H" long:"host-addr" optional:"true" default:"defaults to unix://siphon.#####.sock" description:"Pattern of addresses to create new hosts at, of the form unix://path/to/socket.  '#' characters will be replaced by a random [1-9] digit (the number of hosts this daemon can spawn is implicitly limited to 9^{the number of '#' chars})." `
 	HostCommand string `short:"c" long:"host-command" optional:"true" default:"defaults to /bin/sh" description:"Command to execute inside the new psuedoterminal" `
 }
 
 func init() {
 	parser.AddCommand("daemon", "daemon", "Run a daemon to spawn hosts", &daemonOpts{
-		Address: "unix://siphon.daemon.sock",
+		Address: "unix://siphon.sock",
 		HostAddress: "unix://siphon.#####.sock",
 		HostCommand: "/bin/sh",
 	})
